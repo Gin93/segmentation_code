@@ -12,7 +12,6 @@ all_files = dir(path);
 
 
 %% Read csv file, calculate the begining frame and ending frame
-%timestamps = csvread ('F:\output video jin\Thermal_cut.csv',3,0);
 filename = 'G:\output video jin\segmentation_thermal.csv';
 [A,delimiterOut]=importdata(filename);
 timestamps = A.data;
