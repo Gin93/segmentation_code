@@ -11,9 +11,18 @@ Created on Wed Dec 12 11:06:49 2018
 
 import time 
 import csv
+import sys , os 
+sys.path.append(r'F:\Segmentation code\segmentation_code\python')
 from time import localtime as tt 
+from functions.fs import * 
 
-from fs import * 
+
+#from functions import fs 
+#PACKAGE_PARENT = '..'
+#SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+#sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+
+
 
 def s_to_date (ts):
     h = int (ts / 3600)
@@ -24,11 +33,14 @@ def s_to_date (ts):
 
 
 if __name__ == '__main__':
+#    import x
+
     subjects = [x+1 for x in range(49)]
 #    subjects = [x+1 for x in range(10)]
 #    subjects = [10]
     all_participants_data = {}
-    all_timestamps = read_timestamp_file()
+    time_file = r'F:\Segmentation code\segmentation_code\timestamp\timestamp_byquestion.csv'
+    all_timestamps = read_timestamp_file(time_file) # read timestamps.
 
     for subject in subjects:
         ### get the bvp file path
@@ -58,9 +70,9 @@ if __name__ == '__main__':
         timestamps_each_step = [[timestamps[i] , i] for i in timestamps if timestamps[i] != 'invalid' and timestamps[i]] # filter the 'invalid' and lost data
         timestamps_each_step = [i for i in timestamps_each_step ]
         timestamps_each_step.sort() # add baseline timestamp HERE 
-        bl_time = 40 # set up 40s as the baseline collection period  
-        bl = [timestamps_each_step[0][0] - bl_time,'baseline data'] #
-        timestamps_each_step.insert(0 , bl)
+#        bl_time = 40 # set up 40s as the baseline collection period  
+#        bl = [timestamps_each_step[0][0] - bl_time,'baseline data'] #
+#        timestamps_each_step.insert(0 , bl)
 #            print(timestamps_each_step)
         output_data = { }
         tem_data = []
@@ -75,9 +87,9 @@ if __name__ == '__main__':
                     if ts < timestamps_each_step[1][0]: # less than next stage timestamp, so store the data into cur_state 
                         tem_data.append([float(data) , ts]) 
                         
-                    else:
+                    else:# great than next stage timestamp, save the data, load next state
 #                        print(tem_data)
-                        output_data [timestamps_each_step[0][1]] =  tem_data # great than next stage timestamp, save the data, load next state
+                        output_data [timestamps_each_step[0][1]] =  tem_data 
                         timestamps_each_step.pop(0)
                         tem_data = []
                         

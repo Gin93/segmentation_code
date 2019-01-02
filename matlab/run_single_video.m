@@ -1,4 +1,4 @@
-path = 'F:\output video jin\thermal3\P16_S4 start.mat';
+path = 'F:\output video jin\thermal1\P10_Interview.mat';
 
 
 disp('loading......');

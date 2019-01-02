@@ -28,8 +28,8 @@ def all_files(rootDir,extended):
     return o 
     
     
-def read_timestamp_file ():
-    time_file = 'F:\\output video jin\\timestamp.csv'
+def read_timestamp_file (time_file):
+    
     participants = {}
     
     with open(time_file) as f:
