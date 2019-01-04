@@ -44,7 +44,8 @@ for i = 4:length( all_files) % for each participant , from 1-51 , No participant
             %% read timestamps from loaded csv data
             ts = timestamps(participant_index,:);
             atr_names = filed_names;
-            if ~ismember (participant_index , [32,33,34,35,36,37,38]) % Need too much RAM
+            if ismember (participant_index , [32,33,34,35,36,37,38]) % Need too much RAM
+%              if ismember (participant_index , [31]) % Need too much RAM   
                 %% read the .ats file
                 v = FlirMovieReader(ats_file_path);
                 v = v.set_unit('temperatureFactory');
@@ -74,13 +75,15 @@ for i = 4:length( all_files) % for each participant , from 1-51 , No participant
                 next_atr = string(atr_names(1));
                 has_data_recorded = 0 ; % in case a whole step is lost, that is, check if any data is stored, then output it.
                 f_count = 1 ;
+                x_count = 1 ;
                 %% start reading data step by step
+                skip = cur_ts * 120;
+                step(v,skip) ; 
                 while ~isDone(v)
-                    frameCount = frameCount + 1;
                     %                 skip = skip + 1 ;
-                    %                 if mod(frameCount,100) == 0
-                    %                     disp(frameCount)
-                    %                 end                
+                                    if mod(f_count,500) == 0
+                                        disp(f_count)
+                                    end                
                     %               [frame, metadata] = step(v , skip * 20); % for testing
                     [frame, metadata] = step(v);
                     frame_timestamp = (metadata.FrameNumber - initial_frame_count) * (1/fr);                 
@@ -88,18 +91,26 @@ for i = 4:length( all_files) % for each participant , from 1-51 , No participant
                     
                     % less than next_timestamp, save
                     % to save RAM, empty part should not be saved
-%                     try                      
-                        if (cur_ts <= frame_timestamp) && (frame_timestamp <= next_ts)
-                            output_matrix(:,:,f_count) = frame;
-                            output_frame_counter(f_count) = metadata.FrameNumber;
-                            f_count = f_count + 1 ;
+%                     try               
+
+%                         if (cur_ts <= frame_timestamp) && (frame_timestamp <= next_ts)
+%                             output_matrix(:,:,f_count) = frame;
+%                             output_frame_counter(f_count) = metadata.FrameNumber;
+%                             f_count = f_count + 1 ;
+%                             has_data_recorded = 1 ;
+%                         end
+
+                    if mod(f_count , 4) == 0 % record 1 frame for every 4 frames 
+                           if (cur_ts <= frame_timestamp) && (frame_timestamp <= next_ts)
+                            output_matrix(:,:,x_count) = frame;
+                            output_frame_counter(x_count) = metadata.FrameNumber;
                             has_data_recorded = 1 ;
-                        end
-                        
-%                     catch
-%                         disp ('error')
-%                         disp (ats_file_path)
-%                     end
+                            x_count = x_count +  1 ;
+                           end   
+                    end
+                    f_count = f_count + 1 ;
+                    
+
               
                     if   frame_timestamp > next_ts % save this, break, since only two ts, no next one
                         

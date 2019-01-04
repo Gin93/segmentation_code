@@ -5,56 +5,72 @@ clc
 
 %% Read csv file, calculate the begining frame and ending frame
 %timestamps = csvread ('F:\output video jin\Thermal_cut.csv',3,0);
-filename = 'G:\output video jin\Thermal_cut.csv';
+filename = 'f:\output video jin\Thermal_cut.csv';
 [A,delimiterOut]=importdata(filename);
 timestamps = A.data;
 
 %% read time stamp
 
-participant_index = 3 ; %%% need change 
-ats_index = 'Rec-000022.ats';%%% need change 
+participant_index = 35 ; %%% need change
+ats_index = 'Rec-000055.ats';%%% need change
 
-ats_file_path =  ['G:\by-device\thermal\Participant ', num2str(participant_index) , '\',ats_index];
+ats_file_path =  ['F:\by-device\thermal\Participant ', num2str(participant_index) , '\',ats_index];
 
-
-s4_start_frame = timestamps(participant_index,1);
-s4_end_frame = timestamps(participant_index,2);
-s4_start_frame = s4_start_frame - 90;
-s4_end_frame = s4_end_frame + 90 ;
-s4_start_frame = s4_start_frame - 200;
-s4_end_frame = s4_end_frame - 0 ;
+start_frame = 18476;
+end_frame = 21682;
 
 
-s4_start_frame = 3016
-s4_end_frame = 3343
+total_frame = end_frame - start_frame;
 
-
-total_frame = s4_end_frame - s4_start_frame;
-
-output_matrix = zeros(512,640,total_frame); % the output matrix
+% output_matrix = zeros(:,:,total_frame); % the output matrix
 
 %% start to read the .ats file
 v = FlirMovieReader(ats_file_path);
 v = v.set_unit('temperatureFactory');
-frameCount = 0;
+frameCount = 1;
 disp('cutting......');
+skip_frame = 1 ;
 while ~isDone(v)
     if mod(frameCount,100) == 0
         disp(frameCount)
     end
-    
-    
     [frame, metadata] = step(v);
-    if frameCount >= s4_start_frame && frameCount <= s4_end_frame
-        
-        output_matrix(:,:,frameCount-s4_start_frame+1) = frame;
-    end
-    if frameCount >= s4_end_frame
-        break 
-    end
+        if frameCount >= start_frame && frameCount <= end_frame
+            output_matrix(:,:,frameCount-start_frame+1) = frame;
+        end
     frameCount = frameCount + 1;
+    if frameCount >= end_frame
+        break
+        
+    end
 end
+
+% step(v,60000)
+% frameCount = frameCount + 60000;
+% x_count = 1 ;
+% while ~isDone(v)
+%     if mod(frameCount,100) == 0
+%         disp(frameCount)
+%     end
+%     [frame, metadata] = step(v);
+%     
+%     skip_frame = skip_frame + 1 ;
+%     if mod(skip_frame , 4) == 0
+%         if frameCount >= start_frame && frameCount <= end_frame
+%             output_matrix(:,:,x_count) = frame;
+%             x_count = x_count + 1 ;
+%         end
+%     end
+%     frameCount = frameCount + 1;
+%     if frameCount >= end_frame
+%         break
+%         
+%     end
+% end
 %output path // May need to change
-output_file_name = ['G:\output video jin\thermal2\' ,num2str(participant_index) ,'_.mat'];
+output_file_name = ['f:\output video jin\thermal2\' , 'P' , num2str(participant_index) ,'_S4 start.mat'];
+
+% output_file_name = ['f:\output video jin\thermal2\' ,'P' , num2str(participant_index) ,'_Interview.mat'];
+
 save(output_file_name,'output_matrix','-v7.3');
 

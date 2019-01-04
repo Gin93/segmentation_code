@@ -1,18 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 13 11:17:42 2018
-
-@author: u5541673
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Dec 12 11:06:49 2018
-
-@author: u5541673
-"""
-
-
 
 def convert_16_bits_unix_ts(ts):
     ts_s = ts[:-6]
@@ -37,9 +22,8 @@ def convert_16_bits_unix_date(ts):
 import time 
 import csv
 import sys , os 
-#sys.path.append(r'F:\Segmentation code\segmentation_code\python')
-print(sys.path)
-from python.functions.fs import * 
+sys.path.append(os.path.abspath('..'))
+from functions.fs import *
 
 
 #'1513746299273630'
@@ -51,11 +35,11 @@ if __name__ == '__main__':
     subjects = [x+1 for x in range(49)]
 #    subjects = [x+1 for x in range(10)]
     
-    
-    all_timestamps = read_timestamp_file()    
+    time_file = r'F:\Segmentation code\segmentation_code\timestamp\timestamp_byquestion.csv'
+    all_timestamps = read_timestamp_file(time_file)    
     all_types_data = {}
     data_types = ['accelerometer' , 'emg' , 'gyro' , 'orientation' , 'orientationEuler']
-#    subjects = [9,10]
+    subjects = [31]
 #    data_types = ['accelerometer']
     for data_type in data_types:
         all_participants_data = {}
@@ -66,8 +50,13 @@ if __name__ == '__main__':
             files = all_files(file_path , 1 )
             data_files_path = []
             for file in files:
-                if data_type in file and '_' not in file: # 
-                    data_files_path.append(file) # more than one file 
+                if data_type == 'orientation':
+                    if 'orientation' in file and '_' not in file and 'orientationEuler' not in file: # orientation IS PART OF orientationEuler!!!!!!!!
+                        data_files_path.append(file) # more than one file 
+                    
+                else:
+                    if data_type in file and '_' not in file: # exclude the segmented files 
+                        data_files_path.append(file) # more than one file 
 
             ### read data, may need merge them firstly 
             all_data = [] 
@@ -100,9 +89,7 @@ if __name__ == '__main__':
                         if ts < timestamps_each_step[1][0]: # less than next stage timestamp, so store the data into cur_state 
                             tem_data.append(data)                                    
                         else:
-    #                        print(tem_data)
-                            if timestamps_each_step[0][1] == 'S6 starts' or timestamps_each_step[0][1] == 'S5 ends':
-                                output_data [timestamps_each_step[0][1]] =  tem_data # great than next stage timestamp, save the data, load next state
+                            output_data [timestamps_each_step[0][1]] =  tem_data # great than next stage timestamp, save the data, load next state
                             timestamps_each_step.pop(0)
                             tem_data = []
             
@@ -128,31 +115,7 @@ if __name__ == '__main__':
                     writer = csv.writer(f)
                     for row_data in all_participants_data[subject][each_step]:
                         writer.writerow(row_data)
-            
-        
-#        
-#        
-#        
-#        
-        
-        
-        
-        print(all_types_data['accelerometer'][9]['S6 starts'][0])
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+ 
         
         
         

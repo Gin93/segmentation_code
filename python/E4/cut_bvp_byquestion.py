@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     subjects = [x+1 for x in range(49)]
 #    subjects = [x+1 for x in range(10)]
-#    subjects = [10]
+    subjects = [31]
     all_participants_data = {}
     time_file = r'F:\Segmentation code\segmentation_code\timestamp\timestamp_byquestion.csv'
     all_timestamps = read_timestamp_file(time_file) # read timestamps.

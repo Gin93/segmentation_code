@@ -11,9 +11,11 @@ Created on Wed Dec 12 11:06:49 2018
 
 import time 
 import csv
+import sys , os 
+sys.path.append(r'F:\Segmentation code\segmentation_code\python')
 from time import localtime as tt 
+from functions.fs import * 
 
-from .fs import * 
 
 def s_to_date (ts):
     h = int (ts / 3600)
@@ -26,9 +28,9 @@ def s_to_date (ts):
 if __name__ == '__main__':
     subjects = [x+1 for x in range(49)]
 #    subjects = [x+1 for x in range(10)]
-#    subjects = [10]
+    subjects = [31]
     all_participants_data = {}
-    time_file = r'F:\Segmentation code\segmentation_code\timestamp.csv'
+    time_file = r'F:\Segmentation code\segmentation_code\timestamp\timestamp.csv'
     all_timestamps = read_timestamp_file(time_file) # read timestamps.
 
     for subject in subjects:

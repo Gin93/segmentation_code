@@ -37,7 +37,9 @@ def convert_16_bits_unix_date(ts):
 import time 
 import csv
 
-from fs import * 
+import sys , os 
+sys.path.append(os.path.abspath('..'))
+from functions.fs import *
 
 
 #'1513746299273630'
@@ -49,11 +51,11 @@ if __name__ == '__main__':
     subjects = [x+1 for x in range(49)]
 #    subjects = [x+1 for x in range(10)]
     
-    
-    all_timestamps = read_timestamp_file()    
+    time_file = r'F:\Segmentation code\segmentation_code\timestamp\timestamp.csv'
+    all_timestamps = read_timestamp_file(time_file)    
     all_types_data = {}
     data_types = ['accelerometer' , 'emg' , 'gyro' , 'orientation' , 'orientationEuler']
-#    subjects = [9,10]
+#    subjects = [31]
 #    data_types = ['accelerometer']
     for data_type in data_types:
         all_participants_data = {}
@@ -64,8 +66,13 @@ if __name__ == '__main__':
             files = all_files(file_path , 1 )
             data_files_path = []
             for file in files:
-                if data_type in file and '_' not in file: # 
-                    data_files_path.append(file) # more than one file 
+                if data_type == 'orientation':
+                    if 'orientation' in file and '_' not in file and 'orientationEuler' not in file: # orientation IS PART OF orientationEuler!!!!!!!!
+                        data_files_path.append(file) # more than one file 
+                    
+                else:
+                    if data_type in file and '_' not in file: # exclude the segmented files 
+                        data_files_path.append(file) # more than one file 
 
             ### read data, may need merge them firstly 
             all_data = [] 
@@ -86,6 +93,24 @@ if __name__ == '__main__':
     #            print(timestamps_each_step)
             output_data = { }
             tem_data = []
+            
+#            cur = int (all_data[0][0])  # check if the data reading correctly 
+#            for data in all_data:
+#                ts = int (data[0])
+#                if ts < cur:
+#                    print(subject)
+#                    print(data_files_path)
+#                cur = ts 
+            
+            if all_data:
+                cur = int (all_data[0][0])  # check if the data reading correctly 
+                for data in all_data:
+                    ts = int (data[0])
+                    if ts - cur > 1000000 * 5: #1000000 is 1s 
+                        print(subject)
+                        print(data_files_path)
+                    cur = ts             
+            
             for  data in all_data :
                 ts = data[0]
                 
@@ -99,58 +124,35 @@ if __name__ == '__main__':
                             tem_data.append(data)                                    
                         else:
     #                        print(tem_data)
-                            if timestamps_each_step[0][1] == 'S6 starts' or timestamps_each_step[0][1] == 'S5 ends':
-                                output_data [timestamps_each_step[0][1]] =  tem_data # great than next stage timestamp, save the data, load next state
+#                            if timestamps_each_step[0][1] == 'S6 starts' or timestamps_each_step[0][1] == 'S5 ends': # only save these two stages, others all empty 
+                            output_data [timestamps_each_step[0][1]] =  tem_data # great than next stage timestamp, save the data, load next state
                             timestamps_each_step.pop(0)
                             tem_data = []
             
-#            if len(all_data) > 1:
-#                first_ts = all_data[0] 
-#                last_ts = all_data[-1]
-#                output_data['ts'] = (convert_16_bits_unix_date (first_ts[0]) , convert_16_bits_unix_date(last_ts[0]))
-#            else:
-#                print(data_type , subject )
    
             all_participants_data[subject] = output_data
         all_types_data[data_type] = all_participants_data
 
-    #        print(output_data)
+
                     
-                
-    for data_type in data_types:
-        for subject in all_participants_data:
-            output_path = 'F:\\by-device\\myo\\Participant {}\\'.format(str(subject))
-            for each_step in all_participants_data[subject]:
-                output_file_name = output_path + data_type + '_' + each_step + '.csv'
-                with open (output_file_name,'w',newline = '') as f :
-                    writer = csv.writer(f)
-                    for row_data in all_participants_data[subject][each_step]:
-                        writer.writerow(row_data)
-            
-        
+
+#        #                
+#    for data_type in data_types:
+#        for subject in all_participants_data:
+#            output_path = 'F:\\by-device\\myo\\Participant {}\\'.format(str(subject))
+#            for each_step in all_participants_data[subject]:
+#                output_file_name = output_path + data_type + '_' + each_step + '.csv'
+#                with open (output_file_name,'w',newline = '') as f :
+#                    writer = csv.writer(f)
+#                    for row_data in all_participants_data[subject][each_step]:
+#                        writer.writerow(row_data)
+#            
+#
 #        
 #        
 #        
 #        
-        
-        
-        
-        print(all_types_data['accelerometer'][9]['S6 starts'][0])
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+#        
         
         
         

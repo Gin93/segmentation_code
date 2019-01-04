@@ -23,10 +23,12 @@ from subprocess import Popen
 from moviepy.editor import VideoFileClip
 
 
-time_file = 'F:\\output video jin\\timestamp.csv'
+time_file = r'F:\Segmentation code\segmentation_code\timestamp\timestamp.csv'
 videos_path = 'F:\\output video jin\\3\\'
 output_path = 'F:\\output video jin\\cut_final_1\\'
 example = 'F:\by-device\webcam1\Participant 6'
+
+
 participants = {}
 import csv
 with open(time_file) as f:
